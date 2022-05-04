@@ -138,6 +138,8 @@
 // Changes to this backend using new APIs should be accompanied by a regenerated stripped loader version.
 #define IMGL3W_IMPL
 #include "imgui_impl_opengl3_loader.h"
+#else
+#include <glad/glad.h>
 #endif
 
 // Vertex arrays are not supported on ES2/WebGL1 unless Emscripten which uses an extension
@@ -174,6 +176,11 @@
 // Desktop GL use extension detection
 #if !defined(IMGUI_IMPL_OPENGL_ES2) && !defined(IMGUI_IMPL_OPENGL_ES3)
 #define IMGUI_IMPL_OPENGL_MAY_HAVE_EXTENSIONS
+#endif
+
+#ifdef IMGUI_IMPL_OPENGL_LOADER_CUSTOM
+#undef IMGUI_IMPL_OPENGL_USE_VERTEX_ARRAY
+#undef IMGUI_IMPL_OPENGL_MAY_HAVE_EXTENSIONS
 #endif
 
 // OpenGL Data
@@ -227,8 +234,10 @@ bool    ImGui_ImplOpenGL3_Init(const char* glsl_version)
 #if !defined(IMGUI_IMPL_OPENGL_ES2)
     GLint major = 0;
     GLint minor = 0;
+#if !defined(IMGUI_IMPL_OPENGL_LOADER_CUSTOM)
     glGetIntegerv(GL_MAJOR_VERSION, &major);
     glGetIntegerv(GL_MINOR_VERSION, &minor);
+#endif
     if (major == 0 && minor == 0)
     {
         // Query GL_VERSION in desktop GL 2.x, the string will start with "<major>.<minor>"
